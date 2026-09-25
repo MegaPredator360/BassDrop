@@ -1,92 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace BaseDrop
 {
-    internal enum snd_asset_channel : int
-	{
-		SND_ASSET_CHANNEL_L = 0x1,
-		SND_ASSET_CHANNEL_R = 0x2,
-		SND_ASSET_CHANNEL_C = 0x4,
-		SND_ASSET_CHANNEL_LFE = 0x8,
-		SND_ASSET_CHANNEL_LS = 0x10,
-		SND_ASSET_CHANNEL_RS = 0x20,
-		SND_ASSET_CHANNEL_LB = 0x40,
-		SND_ASSET_CHANNEL_RB = 0x80,
-	};
+    // Where the converter is at, Percent is of all files
+    internal readonly record struct ConversionStatus(int Percent, int FileNumber, int FileCount, string FileName);
 
-	internal enum snd_asset_flags : int
-	{
-		SND_ASSET_FLAG_DEFAULT = 0x0,
-		SND_ASSET_FLAG_LOOPING = 0x1,
-		SND_ASSET_FLAG_PAD_LOOP_BUFFER = 0x2,
-	};
-
-	internal enum snd_asset_format : int
-	{
-		SND_ASSET_FORMAT_PCMS16 = 0x0,
-		SND_ASSET_FORMAT_PCMS24 = 0x1,
-		SND_ASSET_FORMAT_PCMS32 = 0x2,
-		SND_ASSET_FORMAT_IEEE = 0x3,
-		SND_ASSET_FORMAT_XMA4 = 0x4,
-		SND_ASSET_FORMAT_MP3 = 0x5,
-		SND_ASSET_FORMAT_MSADPCM = 0x6,
-		SND_ASSET_FORMAT_WMA = 0x7,
-	};
-
-    internal struct snd_asset
-	{
-        public uint version { get; set; }
-        public uint frame_count { get; set; }
-        public uint frame_rate { get; set; }
-        public uint channel_count { get; set; }
-        public uint header_size { get; set; }
-        public uint block_size { get; set; }
-        public uint buffer_size { get; set; }
-        public snd_asset_format format { get; set; }
-        public snd_asset_channel channel_flags { get; set; }
-        public snd_asset_flags flags { get; set; }
-        public uint seek_table_count { get; set; }
-        public uint seek_ptr { get; set; }
-        public uint data_size { get; set; }
-        public uint data_ptr { get; set; }
-	};
-
-    public partial class Converter : Form
+    internal class AudioConverter
     {
         // Flags
-        private bool ADPCMConv = false;
-        private bool XWMAConv = false;
-        private bool isLoop = false;
-        private string[] FilesConv = null;
-        private bool CanClose = false;
+        private readonly bool ADPCMConv = false;
+        private readonly bool XWMAConv = false;
+        private readonly bool isLoop = false;
         // Dirs
-        private string ExportingDirectory = string.Empty;
-        private string WorkingDirectory = string.Empty;
+        private readonly string ExportingDirectory = string.Empty;
+        private readonly string WorkingDirectory = string.Empty;
+        // Progress
+        private IProgress<ConversionStatus> Progress = null;
+        private string[] FilesConv = null;
+        private int CurrentFile = 0;
+        private int FileCount = 0;
+        // Files that couldn't be converted, and why
+        private readonly List<string> Failures = new List<string>();
 
-        public Converter(Form OwnedParent, string[] Files, string ExportDir, string WorkingDir, bool ADPCM, bool XWMA, bool isLooping)
+        public AudioConverter(string ExportDir, string WorkingDir, bool ADPCM, bool XWMA, bool isLooping)
         {
-            // Set it
-            this.Owner = OwnedParent;
-            // Build
-            InitializeComponent();
             // Set
             ADPCMConv = ADPCM;
             XWMAConv = XWMA;
             isLoop = isLooping;
-            FilesConv = Files;
             ExportingDirectory = ExportDir;
             WorkingDirectory = WorkingDir;
+        }
+
+        // Converts the files, blocking until done, run it off the UI thread. Returns the failures
+        public IReadOnlyList<string> Run(string[] Files, IProgress<ConversionStatus> ProgressReport = null)
+        {
+            // Set
+            Progress = ProgressReport;
+            FilesConv = Files;
+            FileCount = Files.Length;
+            Failures.Clear();
+            // Make sure the output dirs exist, they may have been deleted since startup
+            Directory.CreateDirectory(Path.Combine(ExportingDirectory, "normal"));
+            Directory.CreateDirectory(Path.Combine(ExportingDirectory, "bo_ready"));
+            // Convert each one
+            for (CurrentFile = 0; CurrentFile < FileCount; CurrentFile++)
+            {
+                // Set progress
+                ReportProgress(0.0);
+                // Ship
+                ConvertHandler(Files[CurrentFile]);
+                // Set progress
+                ReportProgress(1.0);
+            }
+            return Failures.ToArray();
+        }
+
+        private void ReportProgress(double FileFraction)
+        {
+            // Overall progress, including how far along the current file is
+            int Percent = Convert.ToInt32(((CurrentFile + FileFraction) / FileCount) * 100.0);
+            Progress?.Report(new ConversionStatus(Percent, Math.Min(CurrentFile + 1, FileCount), FileCount, Path.GetFileName(FilesConv[Math.Min(CurrentFile, FileCount - 1)])));
+        }
+
+        private static void TryDelete(string FilePath)
+        {
+            try
+            {
+                File.Delete(FilePath);
+            }
+            catch
+            {
+                // Nothing
+            }
         }
 
         private void ConvertHandler(string FileConv, string SubPath = "")
@@ -140,32 +132,14 @@ namespace BaseDrop
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Nothing
-            }
-        }
-
-        private void ConverterRun()
-        {
-            // Convert each one
-            for (int f = 0; f < FilesConv.Length; f++)
-            {
-                // Set progress
-                this.Invoke((Action)delegate
+                // Keep going, but remember it
+                lock (Failures)
                 {
-                    this.ProgressBar.Value = Convert.ToInt32(((float)(f + 1) / (float)FilesConv.Length) * 100.0);
-                });
-                // Ship
-                ConvertHandler(FilesConv[f]);
+                    Failures.Add(Path.GetFileName(FileConv) + ": " + ex.Message);
+                }
             }
-            // Set
-            CanClose = true;
-            // Close
-            this.Invoke((Action)delegate
-            {
-                this.Close();
-            });
         }
 
         private void FastFileHandler(string FileConv)
@@ -320,10 +294,7 @@ namespace BaseDrop
                 for (int c = 0; c < FilesToConvert.Count; c++)
                 {
                     // Set progress
-                    this.Invoke((Action)delegate
-                    {
-                        this.ProgressBar.Value = Convert.ToInt32(((float)(c + 1) / (float)FilesToConvert.Count) * 100.0);
-                    });
+                    ReportProgress((double)c / FilesToConvert.Count);
                     // Generate a subpath for the normal files folder
                     string ToConvert = FilesToConvert.ElementAt(c);
                     // Generate
@@ -345,6 +316,8 @@ namespace BaseDrop
 
         private void ConvertToBO(string FileConv, string SubPath = "")
         {
+            // Remove any leftover result from a previous failed run
+            TryDelete(Path.Combine(WorkingDirectory, "boResult.wav"));
             // Run the file through the converter for the format we want
             File.Copy(FileConv, Path.Combine(WorkingDirectory, "convToBO.wav"), true);
             // Convert to format
@@ -518,19 +491,15 @@ namespace BaseDrop
             else
             {
                 // Just clean up, failed
-                try
-                {
-                    File.Delete(Path.Combine(WorkingDirectory, "convToBO.wav"));
-                }
-                catch
-                {
-                    // Nothing
-                }
+                TryDelete(Path.Combine(WorkingDirectory, "convToBO.wav"));
+                throw new InvalidOperationException("the encoder didn't produce an output file.");
             }
         }
 
         private void ConvertToNormal(string FileConv, string SubPath = "")
         {
+            // Remove any leftover result from a previous failed run
+            TryDelete(Path.Combine(WorkingDirectory, "normalResult.wav"));
             // We must read the file, and convert back to a normal WAV
             using (BinaryReader readFile = new BinaryReader(File.OpenRead(FileConv)))
             {
@@ -675,15 +644,9 @@ namespace BaseDrop
                 }
                 else
                 {
-                    // Just clean up
-                    try
-                    {
-                        File.Delete(Path.Combine(WorkingDirectory, "convToNormal.wav"));
-                    }
-                    catch
-                    {
-                        // Nothing
-                    }
+                    // Just clean up, failed
+                    TryDelete(Path.Combine(WorkingDirectory, "convToNormal.wav"));
+                    throw new InvalidOperationException("the encoder didn't produce an output file.");
                 }
             }
         }
@@ -710,21 +673,6 @@ namespace BaseDrop
                 // Wait
                 pexporter.WaitForExit();
             }
-        }
-
-        private void Converter_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            // Stop
-            if (e.CloseReason == CloseReason.UserClosing && !CanClose)
-            {
-                e.Cancel = true;
-            }
-        }
-
-        private void Converter_Load(object sender, EventArgs e)
-        {
-            // Convert
-            Task.Run((Action)ConverterRun);
         }
     }
 }

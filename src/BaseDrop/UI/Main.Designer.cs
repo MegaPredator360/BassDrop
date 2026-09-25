@@ -36,12 +36,13 @@
             ExportFolderLabel = new System.Windows.Forms.Label();
             ExportFolderPath = new System.Windows.Forms.TextBox();
             ExportFolderBrowse = new System.Windows.Forms.Button();
+            ConversionProgress = new System.Windows.Forms.ProgressBar();
             SuspendLayout();
             // 
             // ConverterBox
             // 
             ConverterBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ConverterBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            ConverterBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             ConverterBox.Font = new System.Drawing.Font("Segoe UI", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             ConverterBox.Location = new System.Drawing.Point(14, 81);
             ConverterBox.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
@@ -80,20 +81,20 @@
             FormatADPCM.TabIndex = 0;
             FormatADPCM.TabStop = true;
             FormatADPCM.Text = "Export ADPCM - Used for player audio and music mostly";
-            //
+            // 
             // ExportFolderLabel
-            //
+            // 
             ExportFolderLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             ExportFolderLabel.AutoSize = true;
             ExportFolderLabel.Location = new System.Drawing.Point(14, 419);
             ExportFolderLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             ExportFolderLabel.Name = "ExportFolderLabel";
-            ExportFolderLabel.Size = new System.Drawing.Size(80, 15);
+            ExportFolderLabel.Size = new System.Drawing.Size(77, 15);
             ExportFolderLabel.TabIndex = 4;
             ExportFolderLabel.Text = "Export folder:";
-            //
+            // 
             // ExportFolderPath
-            //
+            // 
             ExportFolderPath.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             ExportFolderPath.Location = new System.Drawing.Point(102, 415);
             ExportFolderPath.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -101,9 +102,9 @@
             ExportFolderPath.ReadOnly = true;
             ExportFolderPath.Size = new System.Drawing.Size(456, 23);
             ExportFolderPath.TabIndex = 5;
-            //
+            // 
             // ExportFolderBrowse
-            //
+            // 
             ExportFolderBrowse.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             ExportFolderBrowse.Location = new System.Drawing.Point(566, 414);
             ExportFolderBrowse.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -113,13 +114,24 @@
             ExportFolderBrowse.Text = "Browse...";
             ExportFolderBrowse.UseVisualStyleBackColor = true;
             ExportFolderBrowse.Click += ExportFolderBrowse_Click;
-            //
+            // 
+            // ConversionProgress
+            // 
+            ConversionProgress.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ConversionProgress.Location = new System.Drawing.Point(14, 449);
+            ConversionProgress.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            ConversionProgress.Name = "ConversionProgress";
+            ConversionProgress.Size = new System.Drawing.Size(642, 20);
+            ConversionProgress.TabIndex = 7;
+            ConversionProgress.Visible = false;
+            // 
             // Main
             // 
             AllowDrop = true;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(672, 452);
+            ClientSize = new System.Drawing.Size(672, 482);
+            Controls.Add(ConversionProgress);
             Controls.Add(ExportFolderBrowse);
             Controls.Add(ExportFolderPath);
             Controls.Add(ExportFolderLabel);
@@ -131,8 +143,8 @@
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             MaximizeBox = false;
-            MaximumSize = new System.Drawing.Size(688, 491);
-            MinimumSize = new System.Drawing.Size(688, 491);
+            MaximumSize = new System.Drawing.Size(688, 521);
+            MinimumSize = new System.Drawing.Size(688, 521);
             Name = "Main";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "BassDrop - BO1 Sound Transcoder";
@@ -153,6 +165,7 @@
         private System.Windows.Forms.Label ExportFolderLabel;
         private System.Windows.Forms.TextBox ExportFolderPath;
         private System.Windows.Forms.Button ExportFolderBrowse;
+        private System.Windows.Forms.ProgressBar ConversionProgress;
     }
 }
 
