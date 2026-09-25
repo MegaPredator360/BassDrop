@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Converter));
             this.label1 = new System.Windows.Forms.Label();
-            this.ProgressBar = new BaseDrop.FlatUI.FlatProgress();
+            this.ProgressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // label1
@@ -50,12 +50,9 @@
             this.ProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.ProgressBar.Location = new System.Drawing.Point(12, 70);
             this.ProgressBar.Name = "ProgressBar";
-            this.ProgressBar.Progress = 0;
-            this.ProgressBar.ProgressBorder = System.Drawing.Color.Yellow;
-            this.ProgressBar.ProgressFill = System.Drawing.Color.Yellow;
+            this.ProgressBar.Value = 0;
             this.ProgressBar.Size = new System.Drawing.Size(343, 23);
             this.ProgressBar.TabIndex = 1;
-            this.ProgressBar.Text = "flatProgress1";
             // 
             // Converter
             // 
@@ -82,6 +79,6 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private FlatUI.FlatProgress ProgressBar;
+        private System.Windows.Forms.ProgressBar ProgressBar;
     }
 }

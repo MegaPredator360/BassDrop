@@ -30,9 +30,9 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.ConverterBox = new System.Windows.Forms.PictureBox();
-            this.FormatLooping = new BaseDrop.FlatUI.FlatCheckbox();
-            this.FormatXWMA = new BaseDrop.FlatUI.FlatRadio();
-            this.FormatADPCM = new BaseDrop.FlatUI.FlatRadio();
+            this.FormatLooping = new System.Windows.Forms.CheckBox();
+            this.FormatXWMA = new System.Windows.Forms.RadioButton();
+            this.FormatADPCM = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.ConverterBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -52,9 +52,8 @@
             // FormatLooping
             // 
             this.FormatLooping.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.FormatLooping.BorderColor = System.Drawing.Color.Yellow;
             this.FormatLooping.ForeColor = System.Drawing.Color.White;
-            this.FormatLooping.isChecked = false;
+            this.FormatLooping.Checked = false;
             this.FormatLooping.Location = new System.Drawing.Point(455, 12);
             this.FormatLooping.Name = "FormatLooping";
             this.FormatLooping.Size = new System.Drawing.Size(108, 17);
@@ -63,27 +62,23 @@
             // 
             // FormatXWMA
             // 
-            this.FormatXWMA.BorderColor = System.Drawing.Color.Yellow;
             this.FormatXWMA.ForeColor = System.Drawing.Color.White;
-            this.FormatXWMA.isChecked = false;
+            this.FormatXWMA.Checked = false;
             this.FormatXWMA.Location = new System.Drawing.Point(16, 35);
             this.FormatXWMA.Name = "FormatXWMA";
             this.FormatXWMA.Size = new System.Drawing.Size(249, 17);
             this.FormatXWMA.TabIndex = 1;
             this.FormatXWMA.Text = "Export XWMA - Used for everything else";
-            this.FormatXWMA.Click += new System.EventHandler(this.FormatXWMA_Click);
             // 
             // FormatADPCM
             // 
-            this.FormatADPCM.BorderColor = System.Drawing.Color.Yellow;
             this.FormatADPCM.ForeColor = System.Drawing.Color.White;
-            this.FormatADPCM.isChecked = true;
+            this.FormatADPCM.Checked = true;
             this.FormatADPCM.Location = new System.Drawing.Point(16, 12);
             this.FormatADPCM.Name = "FormatADPCM";
             this.FormatADPCM.Size = new System.Drawing.Size(313, 17);
             this.FormatADPCM.TabIndex = 0;
             this.FormatADPCM.Text = "Export ADPCM - Used for player audio and music mostly";
-            this.FormatADPCM.Click += new System.EventHandler(this.FormatADPCM_Click);
             // 
             // Main
             // 
@@ -114,10 +109,10 @@
 
         #endregion
 
-        private FlatUI.FlatRadio FormatADPCM;
-        private FlatUI.FlatRadio FormatXWMA;
+        private System.Windows.Forms.RadioButton FormatADPCM;
+        private System.Windows.Forms.RadioButton FormatXWMA;
         private System.Windows.Forms.PictureBox ConverterBox;
-        private FlatUI.FlatCheckbox FormatLooping;
+        private System.Windows.Forms.CheckBox FormatLooping;
     }
 }
 

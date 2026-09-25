@@ -154,7 +154,7 @@ namespace BaseDrop
                 // Set progress
                 this.Invoke((Action)delegate
                 {
-                    this.ProgressBar.Progress = Convert.ToInt32(((float)(f + 1) / (float)FilesConv.Length) * 100.0);
+                    this.ProgressBar.Value = Convert.ToInt32(((float)(f + 1) / (float)FilesConv.Length) * 100.0);
                 });
                 // Ship
                 ConvertHandler(FilesConv[f]);
@@ -322,7 +322,7 @@ namespace BaseDrop
                     // Set progress
                     this.Invoke((Action)delegate
                     {
-                        this.ProgressBar.Progress = Convert.ToInt32(((float)(c + 1) / (float)FilesToConvert.Count) * 100.0);
+                        this.ProgressBar.Value = Convert.ToInt32(((float)(c + 1) / (float)FilesToConvert.Count) * 100.0);
                     });
                     // Generate a subpath for the normal files folder
                     string ToConvert = FilesToConvert.ElementAt(c);

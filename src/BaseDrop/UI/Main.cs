@@ -65,18 +65,6 @@ namespace BaseDrop
             }
         }
 
-        private void FormatXWMA_Click(object sender, EventArgs e)
-        {
-            // Uncheck ADPCM
-            this.FormatADPCM.isChecked = false;
-        }
-
-        private void FormatADPCM_Click(object sender, EventArgs e)
-        {
-            // Uncheck XWMA
-            this.FormatXWMA.isChecked = false;
-        }
-
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Clean up
@@ -109,7 +97,7 @@ namespace BaseDrop
                 if (files != null && files.Length > 0)
                 {
                     // Show it
-                    new Converter(this, files, ResultDirectory, WorkingDirectory, this.FormatADPCM.isChecked, this.FormatXWMA.isChecked, this.FormatLooping.isChecked).ShowDialog();
+                    new Converter(this, files, ResultDirectory, WorkingDirectory, this.FormatADPCM.Checked, this.FormatXWMA.Checked, this.FormatLooping.Checked).ShowDialog();
                 }
             }
         }
