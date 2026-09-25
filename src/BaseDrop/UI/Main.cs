@@ -102,7 +102,7 @@ namespace BaseDrop
                 // Try and use it
                 if (!SetResultDirectory(Dialog.SelectedPath))
                 {
-                    MessageBox.Show(this, "The selected folder can't be used for exporting.", "BassDrop", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ErrorDialog.ShowError(this, "The selected folder can't be used for exporting.");
                     return;
                 }
                 // Remember it
@@ -173,12 +173,12 @@ namespace BaseDrop
                 // Let the user know if anything went wrong
                 if (Failures.Count > 0)
                 {
-                    MessageBox.Show(this, "Some files couldn't be converted:\n\n" + string.Join("\n", Failures.Take(15)) + (Failures.Count > 15 ? "\n..." : ""), "BassDrop", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    ErrorDialog.ShowWarning(this, $"{Failures.Count} file(s) couldn't be converted:", Failures);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, "The conversion failed: " + ex.Message, "BassDrop", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ErrorDialog.ShowError(this, "The conversion failed: " + ex.Message);
             }
             finally
             {
