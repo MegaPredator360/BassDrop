@@ -184,7 +184,7 @@ namespace BaseDrop
             try
             {
                 // Decompress directly to memory buffer
-                var DecompressedBuffer = Ionic.Zlib.ZlibStream.UncompressBuffer(CompressedBuffer);
+                var DecompressedBuffer = Utilities.ZlibDecompress(CompressedBuffer);
                 // We made it
                 CompressedBuffer = null;
                 // Scan the buffer for any and all data
