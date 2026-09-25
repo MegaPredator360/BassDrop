@@ -33,6 +33,9 @@
             FormatLooping = new System.Windows.Forms.CheckBox();
             FormatXWMA = new System.Windows.Forms.RadioButton();
             FormatADPCM = new System.Windows.Forms.RadioButton();
+            ExportFolderLabel = new System.Windows.Forms.Label();
+            ExportFolderPath = new System.Windows.Forms.TextBox();
+            ExportFolderBrowse = new System.Windows.Forms.Button();
             SuspendLayout();
             // 
             // ConverterBox
@@ -77,13 +80,49 @@
             FormatADPCM.TabIndex = 0;
             FormatADPCM.TabStop = true;
             FormatADPCM.Text = "Export ADPCM - Used for player audio and music mostly";
-            // 
+            //
+            // ExportFolderLabel
+            //
+            ExportFolderLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            ExportFolderLabel.AutoSize = true;
+            ExportFolderLabel.Location = new System.Drawing.Point(14, 419);
+            ExportFolderLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            ExportFolderLabel.Name = "ExportFolderLabel";
+            ExportFolderLabel.Size = new System.Drawing.Size(80, 15);
+            ExportFolderLabel.TabIndex = 4;
+            ExportFolderLabel.Text = "Export folder:";
+            //
+            // ExportFolderPath
+            //
+            ExportFolderPath.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ExportFolderPath.Location = new System.Drawing.Point(102, 415);
+            ExportFolderPath.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            ExportFolderPath.Name = "ExportFolderPath";
+            ExportFolderPath.ReadOnly = true;
+            ExportFolderPath.Size = new System.Drawing.Size(456, 23);
+            ExportFolderPath.TabIndex = 5;
+            //
+            // ExportFolderBrowse
+            //
+            ExportFolderBrowse.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            ExportFolderBrowse.Location = new System.Drawing.Point(566, 414);
+            ExportFolderBrowse.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            ExportFolderBrowse.Name = "ExportFolderBrowse";
+            ExportFolderBrowse.Size = new System.Drawing.Size(90, 25);
+            ExportFolderBrowse.TabIndex = 6;
+            ExportFolderBrowse.Text = "Browse...";
+            ExportFolderBrowse.UseVisualStyleBackColor = true;
+            ExportFolderBrowse.Click += ExportFolderBrowse_Click;
+            //
             // Main
             // 
             AllowDrop = true;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(672, 417);
+            ClientSize = new System.Drawing.Size(672, 452);
+            Controls.Add(ExportFolderBrowse);
+            Controls.Add(ExportFolderPath);
+            Controls.Add(ExportFolderLabel);
             Controls.Add(FormatLooping);
             Controls.Add(ConverterBox);
             Controls.Add(FormatXWMA);
@@ -92,8 +131,8 @@
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             MaximizeBox = false;
-            MaximumSize = new System.Drawing.Size(688, 456);
-            MinimumSize = new System.Drawing.Size(688, 456);
+            MaximumSize = new System.Drawing.Size(688, 491);
+            MinimumSize = new System.Drawing.Size(688, 491);
             Name = "Main";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "BassDrop - BO1 Sound Transcoder";
@@ -101,6 +140,7 @@
             DragDrop += Main_DragDrop;
             DragOver += Main_DragOver;
             ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -110,6 +150,9 @@
         private System.Windows.Forms.RadioButton FormatXWMA;
         private System.Windows.Forms.Label ConverterBox;
         private System.Windows.Forms.CheckBox FormatLooping;
+        private System.Windows.Forms.Label ExportFolderLabel;
+        private System.Windows.Forms.TextBox ExportFolderPath;
+        private System.Windows.Forms.Button ExportFolderBrowse;
     }
 }
 
