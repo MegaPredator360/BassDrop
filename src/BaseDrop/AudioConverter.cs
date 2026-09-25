@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace BaseDrop
 {
-    // Where the converter is at, Percent is of all files
-    internal readonly record struct ConversionStatus(int Percent, int FileNumber, int FileCount, string FileName);
+    // Where the converter is at for one file. FileDone is set once per file when it finishes, Error is null if it went fine
+    internal readonly record struct ConversionStatus(int FileIndex, int FilePercent, bool FileDone, string Error);
 
     internal class AudioConverter
     {
@@ -22,9 +22,7 @@ namespace BaseDrop
         private readonly string WorkingDirectory = string.Empty;
         // Progress
         private IProgress<ConversionStatus> Progress = null;
-        private string[] FilesConv = null;
         private int CurrentFile = 0;
-        private int FileCount = 0;
         // Files that couldn't be converted, and why
         private readonly List<string> Failures = new List<string>();
 
@@ -43,30 +41,29 @@ namespace BaseDrop
         {
             // Set
             Progress = ProgressReport;
-            FilesConv = Files;
-            FileCount = Files.Length;
             Failures.Clear();
             // Make sure the output dirs exist, they may have been deleted since startup
             Directory.CreateDirectory(Path.Combine(ExportingDirectory, "normal"));
             Directory.CreateDirectory(Path.Combine(ExportingDirectory, "bo_ready"));
             // Convert each one
-            for (CurrentFile = 0; CurrentFile < FileCount; CurrentFile++)
+            for (CurrentFile = 0; CurrentFile < Files.Length; CurrentFile++)
             {
                 // Set progress
                 ReportProgress(0.0);
-                // Ship
+                // Ship, anything added to the failures meanwhile belongs to this file
+                int FailuresBefore = Failures.Count;
                 ConvertHandler(Files[CurrentFile]);
-                // Set progress
-                ReportProgress(1.0);
+                // Done with it
+                string Error = Failures.Count > FailuresBefore ? string.Join("\n", Failures.Skip(FailuresBefore)) : null;
+                Progress?.Report(new ConversionStatus(CurrentFile, 100, true, Error));
             }
             return Failures.ToArray();
         }
 
         private void ReportProgress(double FileFraction)
         {
-            // Overall progress, including how far along the current file is
-            int Percent = Convert.ToInt32(((CurrentFile + FileFraction) / FileCount) * 100.0);
-            Progress?.Report(new ConversionStatus(Percent, Math.Min(CurrentFile + 1, FileCount), FileCount, Path.GetFileName(FilesConv[Math.Min(CurrentFile, FileCount - 1)])));
+            // How far along the current file is
+            Progress?.Report(new ConversionStatus(CurrentFile, Convert.ToInt32(FileFraction * 100.0), false, null));
         }
 
         private static void TryDelete(string FilePath)
@@ -128,8 +125,16 @@ namespace BaseDrop
                             {
                                 ConvertToBO(FileConv, SubPath);
                             }
+                            else
+                            {
+                                throw new NotSupportedException("only .wav and .ff files are supported.");
+                            }
                         }
                     }
+                }
+                else
+                {
+                    throw new NotSupportedException("not a file.");
                 }
             }
             catch (Exception ex)

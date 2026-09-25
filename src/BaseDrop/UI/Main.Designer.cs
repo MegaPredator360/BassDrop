@@ -36,7 +36,12 @@
             ExportFolderLabel = new System.Windows.Forms.Label();
             ExportFolderPath = new System.Windows.Forms.TextBox();
             ExportFolderBrowse = new System.Windows.Forms.Button();
-            ConversionProgress = new System.Windows.Forms.ProgressBar();
+            ConversionTable = new System.Windows.Forms.DataGridView();
+            FileColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            DurationColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            SizeColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            ProgressColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            ((System.ComponentModel.ISupportInitialize)ConversionTable).BeginInit();
             SuspendLayout();
             // 
             // ConverterBox
@@ -114,24 +119,77 @@
             ExportFolderBrowse.Text = "Browse...";
             ExportFolderBrowse.UseVisualStyleBackColor = true;
             ExportFolderBrowse.Click += ExportFolderBrowse_Click;
-            // 
-            // ConversionProgress
-            // 
-            ConversionProgress.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ConversionProgress.Location = new System.Drawing.Point(14, 449);
-            ConversionProgress.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            ConversionProgress.Name = "ConversionProgress";
-            ConversionProgress.Size = new System.Drawing.Size(642, 20);
-            ConversionProgress.TabIndex = 7;
-            ConversionProgress.Visible = false;
-            // 
+            //
+            // ConversionTable
+            //
+            ConversionTable.AllowUserToAddRows = false;
+            ConversionTable.AllowUserToDeleteRows = false;
+            ConversionTable.AllowUserToResizeRows = false;
+            ConversionTable.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ConversionTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            ConversionTable.BackgroundColor = System.Drawing.SystemColors.Window;
+            ConversionTable.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.SystemColors.Control;
+            ConversionTable.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.SystemColors.ControlText;
+            ConversionTable.ColumnHeadersDefaultCellStyle.SelectionBackColor = System.Drawing.SystemColors.Control;
+            ConversionTable.ColumnHeadersDefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            ConversionTable.EnableHeadersVisualStyles = false;
+            ConversionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            ConversionTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { FileColumn, DurationColumn, SizeColumn, ProgressColumn });
+            ConversionTable.Location = new System.Drawing.Point(14, 81);
+            ConversionTable.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            ConversionTable.MultiSelect = false;
+            ConversionTable.Name = "ConversionTable";
+            ConversionTable.ReadOnly = true;
+            ConversionTable.RowHeadersVisible = false;
+            ConversionTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            ConversionTable.Size = new System.Drawing.Size(642, 320);
+            ConversionTable.TabIndex = 7;
+            ConversionTable.Visible = false;
+            ConversionTable.CellPainting += ConversionTable_CellPainting;
+            ConversionTable.SelectionChanged += ConversionTable_SelectionChanged;
+            //
+            // FileColumn
+            //
+            FileColumn.FillWeight = 100F;
+            FileColumn.HeaderText = "File";
+            FileColumn.Name = "FileColumn";
+            FileColumn.ReadOnly = true;
+            FileColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            //
+            // DurationColumn
+            //
+            DurationColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            DurationColumn.HeaderText = "Duration";
+            DurationColumn.Name = "DurationColumn";
+            DurationColumn.ReadOnly = true;
+            DurationColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            DurationColumn.Width = 80;
+            //
+            // SizeColumn
+            //
+            SizeColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            SizeColumn.HeaderText = "Size";
+            SizeColumn.Name = "SizeColumn";
+            SizeColumn.ReadOnly = true;
+            SizeColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            SizeColumn.Width = 85;
+            //
+            // ProgressColumn
+            //
+            ProgressColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            ProgressColumn.HeaderText = "Progress";
+            ProgressColumn.Name = "ProgressColumn";
+            ProgressColumn.ReadOnly = true;
+            ProgressColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            ProgressColumn.Width = 180;
+            //
             // Main
             // 
             AllowDrop = true;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(672, 482);
-            Controls.Add(ConversionProgress);
+            ClientSize = new System.Drawing.Size(672, 452);
+            Controls.Add(ConversionTable);
             Controls.Add(ExportFolderBrowse);
             Controls.Add(ExportFolderPath);
             Controls.Add(ExportFolderLabel);
@@ -143,14 +201,15 @@
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             MaximizeBox = false;
-            MaximumSize = new System.Drawing.Size(688, 521);
-            MinimumSize = new System.Drawing.Size(688, 521);
+            MaximumSize = new System.Drawing.Size(688, 491);
+            MinimumSize = new System.Drawing.Size(688, 491);
             Name = "Main";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "BassDrop - BO1 Sound Transcoder";
             FormClosing += Main_FormClosing;
             DragDrop += Main_DragDrop;
             DragOver += Main_DragOver;
+            ((System.ComponentModel.ISupportInitialize)ConversionTable).EndInit();
             ResumeLayout(false);
             PerformLayout();
 
@@ -165,7 +224,11 @@
         private System.Windows.Forms.Label ExportFolderLabel;
         private System.Windows.Forms.TextBox ExportFolderPath;
         private System.Windows.Forms.Button ExportFolderBrowse;
-        private System.Windows.Forms.ProgressBar ConversionProgress;
+        private System.Windows.Forms.DataGridView ConversionTable;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FileColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DurationColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SizeColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ProgressColumn;
     }
 }
 

@@ -19,10 +19,23 @@ namespace BaseDrop
         private static string ResultDirectory = string.Empty;
         // Whether a conversion is running
         private bool IsConverting = false;
+        // Animates the progress bars that have nothing to show yet
+        private readonly System.Windows.Forms.Timer MarqueeTimer = new System.Windows.Forms.Timer { Interval = 30 };
+        private int MarqueeOffset = 0;
+
+        // State of each row in the conversion table
+        private enum FileState { Pending, Converting, Done, Failed }
+
+        private class FileProgress
+        {
+            public FileState State = FileState.Pending;
+            public int Percent = 0;
+        }
 
         public Main()
         {
             InitializeComponent();
+            MarqueeTimer.Tick += MarqueeTimer_Tick;
             // Setup
             SetupDirectories();
             // Setup files
@@ -145,6 +158,8 @@ namespace BaseDrop
 
         private async Task ConvertFiles(string[] Files)
         {
+            // Fill the table with what we're about to convert
+            FillConversionTable(Files);
             // Lock the UI
             SetConverting(true);
             try
@@ -172,20 +187,41 @@ namespace BaseDrop
             }
         }
 
+        private void FillConversionTable(string[] Files)
+        {
+            ConversionTable.Rows.Clear();
+            foreach (var FilePath in Files)
+            {
+                // Name, duration and size, the progress column is drawn from the row's tag
+                bool IsFile = File.Exists(FilePath);
+                string Duration = AudioInfo.FormatDuration(AudioInfo.GetDuration(FilePath));
+                string Size = IsFile ? AudioInfo.FormatSize(new FileInfo(FilePath).Length) : "—";
+                int Row = ConversionTable.Rows.Add(Path.GetFileName(FilePath), Duration, Size, null);
+                ConversionTable.Rows[Row].Tag = new FileProgress();
+            }
+            ConversionTable.ClearSelection();
+        }
+
         private void ShowStatus(ConversionStatus Status)
         {
-            // Show what's being converted
-            ConverterBox.Text = $"Converting {Status.FileNumber} of {Status.FileCount}...\n{Status.FileName}";
-            // No progress yet, animate so it's clear something is happening
-            if (Status.Percent <= 0)
+            // Update the file's row
+            var Row = ConversionTable.Rows[Status.FileIndex];
+            var Progress = (FileProgress)Row.Tag;
+            Progress.Percent = Status.FilePercent;
+            if (Status.FileDone)
             {
-                ConversionProgress.Style = ProgressBarStyle.Marquee;
+                Progress.State = Status.Error == null ? FileState.Done : FileState.Failed;
+                // Hover the bar to see why it failed
+                Row.Cells[ProgressColumn.Index].ToolTipText = Status.Error ?? string.Empty;
             }
             else
             {
-                ConversionProgress.Style = ProgressBarStyle.Continuous;
-                ConversionProgress.Value = Math.Clamp(Status.Percent, 0, 100);
+                Progress.State = FileState.Converting;
+                // Keep the file being converted in view
+                if (!Row.Displayed)
+                    ConversionTable.FirstDisplayedScrollingRowIndex = Status.FileIndex;
             }
+            ConversionTable.InvalidateCell(ProgressColumn.Index, Status.FileIndex);
         }
 
         private void SetConverting(bool Converting)
@@ -198,21 +234,89 @@ namespace BaseDrop
             FormatLooping.Enabled = !Converting;
             ExportFolderPath.Enabled = !Converting;
             ExportFolderBrowse.Enabled = !Converting;
-            ConverterBox.Enabled = !Converting;
-            ConverterBox.Text = Converting ? "Converting..." : "Drop audio files here";
+            // The table replaces the drop box from the first conversion on, and stays up until the next one
             if (Converting)
             {
-                // Start the bar over for the new conversion
-                ConversionProgress.Style = ProgressBarStyle.Marquee;
-                ConversionProgress.Value = 0;
-                ConversionProgress.Visible = true;
+                ConverterBox.Visible = false;
+                ConversionTable.Visible = true;
+                MarqueeTimer.Start();
             }
             else
             {
-                // Done, keep the bar full until the next conversion
-                ConversionProgress.Style = ProgressBarStyle.Continuous;
-                ConversionProgress.Value = 100;
+                MarqueeTimer.Stop();
             }
+        }
+
+        private void MarqueeTimer_Tick(object sender, EventArgs e)
+        {
+            // Move the marquee on rows that are converting without progress to show yet
+            MarqueeOffset += 4;
+            foreach (DataGridViewRow Row in ConversionTable.Rows)
+            {
+                if (Row.Tag is FileProgress Progress && Progress.State == FileState.Converting && Progress.Percent == 0 && Row.Displayed)
+                    ConversionTable.InvalidateCell(ProgressColumn.Index, Row.Index);
+            }
+        }
+
+        private void ConversionTable_SelectionChanged(object sender, EventArgs e)
+        {
+            // The table is just for showing progress
+            ConversionTable.ClearSelection();
+        }
+
+        private void ConversionTable_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            // Draw a progress bar in the progress column
+            if (e.RowIndex < 0 || e.ColumnIndex != ProgressColumn.Index || ConversionTable.Rows[e.RowIndex].Tag is not FileProgress Progress)
+                return;
+
+            e.PaintBackground(e.ClipBounds, false);
+
+            var Bar = Rectangle.Inflate(e.CellBounds, -6, -4);
+            var Inner = Rectangle.Inflate(Bar, -2, -2);
+            Color FillColor = Progress.State == FileState.Failed ? Color.IndianRed : SystemColors.Highlight;
+            Color TextColor = e.CellStyle.ForeColor;
+            string Text;
+
+            // Track
+            using (var Border = new Pen(SystemColors.ControlDark))
+                e.Graphics.DrawRectangle(Border, Bar.X, Bar.Y, Bar.Width - 1, Bar.Height - 1);
+
+            using (var Fill = new SolidBrush(FillColor))
+            {
+                switch (Progress.State)
+                {
+                    case FileState.Converting when Progress.Percent == 0:
+                        // Nothing to measure yet, slide a block along the bar
+                        int BlockWidth = Math.Max(Inner.Width / 4, 1);
+                        int BlockX = Inner.X - BlockWidth + (MarqueeOffset % (Inner.Width + BlockWidth));
+                        var Block = Rectangle.Intersect(new Rectangle(BlockX, Inner.Y, BlockWidth, Inner.Height), Inner);
+                        if (!Block.IsEmpty)
+                            e.Graphics.FillRectangle(Fill, Block);
+                        Text = "Converting...";
+                        break;
+                    case FileState.Converting:
+                        e.Graphics.FillRectangle(Fill, Inner.X, Inner.Y, Inner.Width * Math.Clamp(Progress.Percent, 0, 100) / 100, Inner.Height);
+                        Text = Progress.Percent + "%";
+                        break;
+                    case FileState.Done:
+                        e.Graphics.FillRectangle(Fill, Inner);
+                        Text = "Done";
+                        TextColor = Color.White;
+                        break;
+                    case FileState.Failed:
+                        e.Graphics.FillRectangle(Fill, Inner);
+                        Text = "Failed";
+                        TextColor = Color.White;
+                        break;
+                    default:
+                        Text = "Pending";
+                        break;
+                }
+            }
+
+            TextRenderer.DrawText(e.Graphics, Text, e.CellStyle.Font, Bar, TextColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine);
+            e.Handled = true;
         }
 
         private void Main_DragOver(object sender, DragEventArgs e)
