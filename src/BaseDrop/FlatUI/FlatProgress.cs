@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,11 @@ namespace BaseDrop.FlatUI
     public class FlatProgress : Control
     {
         private int progress = 0;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int Progress { get { return progress; } set { progress = value; this.Invalidate(); } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public Color ProgressBorder { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public Color ProgressFill { get; set; }
 
         public FlatProgress()

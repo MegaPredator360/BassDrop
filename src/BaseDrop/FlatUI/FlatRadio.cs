@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -11,9 +12,11 @@ namespace BaseDrop.FlatUI
     internal class FlatRadio : Control
     {
         private bool ischecked = false;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool isChecked { get { return ischecked; } set { ischecked = value; this.Invalidate(); } }
 
         private Color borderColor;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public Color BorderColor { get { return borderColor; } set { borderColor = value; this.Invalidate(); } }
 
         public FlatRadio()
