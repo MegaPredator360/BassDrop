@@ -52,7 +52,6 @@
             // FormatLooping
             // 
             this.FormatLooping.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.FormatLooping.ForeColor = System.Drawing.Color.White;
             this.FormatLooping.Checked = false;
             this.FormatLooping.Location = new System.Drawing.Point(455, 12);
             this.FormatLooping.Name = "FormatLooping";
@@ -62,7 +61,6 @@
             // 
             // FormatXWMA
             // 
-            this.FormatXWMA.ForeColor = System.Drawing.Color.White;
             this.FormatXWMA.Checked = false;
             this.FormatXWMA.Location = new System.Drawing.Point(16, 35);
             this.FormatXWMA.Name = "FormatXWMA";
@@ -72,7 +70,6 @@
             // 
             // FormatADPCM
             // 
-            this.FormatADPCM.ForeColor = System.Drawing.Color.White;
             this.FormatADPCM.Checked = true;
             this.FormatADPCM.Location = new System.Drawing.Point(16, 12);
             this.FormatADPCM.Name = "FormatADPCM";
@@ -85,7 +82,6 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(33)))), ((int)(((byte)(33)))));
             this.ClientSize = new System.Drawing.Size(576, 361);
             this.Controls.Add(this.FormatLooping);
             this.Controls.Add(this.ConverterBox);

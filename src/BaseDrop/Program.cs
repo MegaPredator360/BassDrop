@@ -16,6 +16,10 @@ namespace BaseDrop
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            // Follow the Windows light/dark setting (experimental API)
+#pragma warning disable WFO5001
+            Application.SetColorMode(SystemColorMode.System);
+#pragma warning restore WFO5001
             Application.Run(new Main());
         }
     }
