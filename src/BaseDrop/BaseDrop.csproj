@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>BaseDrop</RootNamespace>
     <AssemblyName>BassDrop</AssemblyName>
-    <ApplicationIcon>WooferIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\WooferIcon.ico</ApplicationIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Platforms>AnyCPU;x64</Platforms>
     <AssemblyTitle>BassDrop</AssemblyTitle>
